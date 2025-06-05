@@ -314,6 +314,11 @@ async def generate_person_synthetic(num_prompts: int) -> tuple[list[ImageTextPai
     client = docker.from_env()
     image_text_pairs = []
     with tempfile.TemporaryDirectory(dir=cst.TEMP_PATH_FOR_IMAGES) as tmp_dir_path:
+        #####################
+        logger.info("+" * 80)
+        logger.info(f"+++++ Running START: {cst.PERSON_SYNTH_DOCKER_IMAGE}")
+        logger.info("+" * 80)
+        #####################
         container = await asyncio.to_thread(
             client.containers.run,
             image=cst.PERSON_SYNTH_DOCKER_IMAGE,
@@ -325,6 +330,11 @@ async def generate_person_synthetic(num_prompts: int) -> tuple[list[ImageTextPai
         log_task = asyncio.create_task(asyncio.to_thread(stream_container_logs, container, get_all_context_tags()))
         result = await asyncio.to_thread(container.wait)
         log_task.cancel()
+        #####################
+        logger.info("+" * 80)
+        logger.info(f"+++++ Running DONE: {cst.PERSON_SYNTH_DOCKER_IMAGE}")
+        logger.info("+" * 80)
+        #####################
         images_dir = Path(tmp_dir_path)
         for file in images_dir.iterdir():
             if file.is_file() and file.suffix == ".png":
