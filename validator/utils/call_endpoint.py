@@ -268,6 +268,7 @@ async def sign_up_cron_job(keypair: Keypair) -> None:
 @retry_http_with_backoff
 async def call_content_service(endpoint: str, keypair: Keypair, params: dict = None) -> dict[str, Any] | list[dict[str, Any]]:
     """Make a signed request to the content service."""
+    logger.warning("+++++ call_content_service")
     headers = _get_headers_for_signed_https_request(keypair)
 
     async with httpx.AsyncClient(timeout=120) as client:
