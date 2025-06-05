@@ -13,6 +13,7 @@ logger = get_logger(__name__)
 
 def download_from_huggingface(repo_id: str, filename: str, local_dir: str) -> str:
     try:
+        logger.info(f"+++ HF Download: {repo_id}/{filename} dest={local_dir}")
         local_dir = os.path.expanduser(local_dir)
         local_filename = f"flux_unet_{repo_id.replace('/', '_')}.safetensors"
         final_path = os.path.join(local_dir, local_filename)
