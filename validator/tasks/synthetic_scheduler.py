@@ -466,6 +466,7 @@ async def create_synthetic_instruct_text_task(
     models: AsyncGenerator[str, None],
     datasets: AsyncGenerator[Dataset, None],
 ) -> RawTask:
+    logger.warning("+++++ create_synthetic_text_task")
     model_id = await anext(models)
 
     logger.info("INSTRUCT_TASK: Starting dataset selection...")
@@ -557,6 +558,7 @@ async def _add_new_task_to_network_if_not_enough(
     dpo_datasets: AsyncGenerator[Dataset, None],
     image_models: AsyncGenerator[ImageModelInfo, None],
 ):
+    logger.warning("+++++ _add_new_task_to_network_if_not_enough")
     current_training_tasks = await get_tasks_with_status(TaskStatus.TRAINING, config.psql_db)
     current_preeval_tasks = await get_tasks_with_status(TaskStatus.PREEVALUATION, config.psql_db)
     current_delayed_tasks = await get_tasks_with_status(TaskStatus.DELAYED, config.psql_db, include_not_ready_tasks=True)
@@ -604,6 +606,7 @@ async def _add_new_task_to_network_if_not_enough(
 
 
 async def schedule_synthetics_periodically(config: Config):
+    logger.warning("+++++ schedule_synthetics_periodically")
     logger.info("Starting the synthetic schedule loop...")
     instruct_datasets = _get_instruct_text_datasets(config.keypair)
     dpo_datasets = _get_dpo_datasets(config.keypair)
