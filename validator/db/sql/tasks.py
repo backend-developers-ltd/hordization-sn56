@@ -634,6 +634,7 @@ async def get_detailed_task_stats(psql_db: PSQLDB, include_tournament_tasks=Fals
 
 
 async def get_tasks_exceeding_termination_time(psql_db: PSQLDB, include_tournament_tasks=False) -> list[RawTask]:
+    logger.warning("+++++ get_tasks_ready_to_evaluate")
     tournament_tasks_clause = (
         ""
         if include_tournament_tasks
