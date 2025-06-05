@@ -91,11 +91,13 @@ async def run_evaluation_from_task_id(
 
     if models:
         models_to_evaluate = models
+        logger.info(f"*** CLI MODELS: {models}")
     else:
         models_to_evaluate = []
         if task_details.hotkey_details:
             for hotkey_detail in task_details.hotkey_details:
                 if hotkey_detail.repo:
+                    logger.info(f"*** TASK MODEL: {hotkey_detail.repo}")
                     models_to_evaluate.append(hotkey_detail.repo)
 
     if task_type == TaskType.IMAGETASK:
