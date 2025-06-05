@@ -21,6 +21,7 @@ hf_api = HfApi()
 
 
 def model_is_a_finetune(original_repo: str, finetuned_model: AutoModelForCausalLM) -> bool:
+    logger.info(f"+++++ model_is_a_finetune: {original_repo=}")
     max_retries = 3
     base_delay = 2
 
@@ -85,6 +86,7 @@ def check_for_lora(model_id: str) -> bool:
         bool: True if it's a LoRA adapter, False otherwise
     """
     try:
+        logger.info(f"+++++ check_for_lora: {model_id=}")
         return "adapter_config.json" in hf_api.list_repo_files(model_id)
     except Exception as e:
         logger.error(f"Error checking for LoRA adapters: {e}")
@@ -93,6 +95,7 @@ def check_for_lora(model_id: str) -> bool:
 
 def get_default_dataset_config(dataset_name: str) -> str | None:
     try:
+        logger.info(f"+++++ get_default_dataset_config: {dataset_name=}")
         logger.info(dataset_name)
         config_names = get_dataset_config_names(dataset_name)
     except Exception:
@@ -148,6 +151,7 @@ def download_from_huggingface(repo_id: str, filename: str, local_dir: str) -> st
             logger.info(f"File {filename} already exists. Skipping download.")
         else:
             with tempfile.TemporaryDirectory() as temp_dir:
+                logger.info(f"+++ HF Download INNER {repo_id} {filename} to {temp_dir}")
                 temp_file_path = hf_hub_download(repo_id=repo_id, filename=filename, local_dir=temp_dir)
                 shutil.move(temp_file_path, final_path)
             logger.info(f"File {filename} downloaded successfully")
