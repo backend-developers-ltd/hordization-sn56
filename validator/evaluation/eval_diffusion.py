@@ -106,17 +106,21 @@ def is_safetensors_available(repo_id: str, model_type: str) -> tuple[bool, str |
 
 def download_base_model(repo_id: str, model_type: str, safetensors_filename: str | None = None) -> str:
     download_dir = cst.CHECKPOINTS_SAVE_PATH if model_type == ImageModelType.SDXL.value else cst.UNET_SAVE_PATH
+    logger.info(f"+++ Base Downloaded {repo_id} {safetensors_filename} to {download_dir} [{model_type}]")
     if safetensors_filename:
         model_path = download_from_huggingface(repo_id, safetensors_filename, download_dir)
         model_name = os.path.basename(model_path)
     else:
         model_name = f"models--{repo_id.replace('/', '--')}"
         save_dir = f"{cst.DIFFUSERS_PATH}/{model_name}"
+        logger.info(f"+++ Hf snapshot BEGIN {repo_id} to {save_dir}")
         model_path = snapshot_download(repo_id=repo_id, local_dir=save_dir, repo_type="model")
+        logger.info(f"+++ Hf snapshot DONE {repo_id} to {model_path}")
     return model_name, model_path
 
 
 def download_lora(repo_id: str) -> str:
+    logger.info(f"+++ Lora Downloaded {repo_id} to {cst.LORAS_SAVE_PATH}")
     lora_save_name = repo_id.split("/")[-1]
     if not os.path.exists(f"{cst.LORAS_SAVE_PATH}/{lora_save_name}.safetensors"):
         lora_filename = find_latest_lora_submission_name(repo_id)
@@ -177,6 +181,7 @@ def inference(image_base64: str, params: Img2ImgPayload, use_prompt: bool = Fals
         model_type=params.model_type,
         is_safetensors=params.is_safetensors,
     )
+    logger.info("Generating image with ComfyUI")
     lora_gen = api_gate.generate(lora_payload)[0]
     lora_gen_loss = calculate_l2_loss(base64_to_image(image_base64), lora_gen)
     logger.info(f"Loss: {lora_gen_loss}")
@@ -212,9 +217,11 @@ def eval_loop(dataset_path: str, params: Img2ImgPayload) -> dict[str, list[float
 def _count_model_parameters(model_path: str, is_safetensors: bool) -> int:
     try:
         if is_safetensors:
+            logger.info(f"Loading model from safetensors: {model_path}")
             state_dict = safetensors.torch.load_file(model_path)
             return sum(p.numel() for p in state_dict.values()) or 0
         else:
+            logger.info(f"Loading StableDiffusionPipeline from pretrained: {model_path}")
             pipe = StableDiffusionPipeline.from_pretrained(model_path)
             total_params = 0
             for attr in pipe.__dict__.values():
@@ -236,6 +243,7 @@ def main():
         exit(1)
 
     is_safetensors, safetensors_filename = is_safetensors_available(base_model_repo, model_type)
+    logger.info(f"Base model: {is_safetensors=} {safetensors_filename=}")
     # Base model download
     logger.info("Downloading base model")
     model_name_or_path, model_path = download_base_model(
@@ -248,9 +256,12 @@ def main():
     test_dataset_path = validate_dataset_path(test_dataset_path)
 
     lora_comfy_template, diffusers_comfy_template = load_comfy_workflows(model_type)
+    logger.info("Connecting to Comfy API")
     api_gate.connect()
+    logger.info("Connected")
 
     results = {"model_params_count": _count_model_parameters(model_path, is_safetensors)}
+    logger.info(f"Base model parameters count: {results['model_params_count']}")
 
     generation_params = cst.EVAL_DEFAULTS.get(model_type, cst.EVAL_DEFAULTS[ImageModelType.SDXL.value])
 
