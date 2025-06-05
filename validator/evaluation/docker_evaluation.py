@@ -101,6 +101,7 @@ async def run_evaluation_docker_text(
     file_format: FileFormat,
     gpu_ids: list[int],
 ) -> DockerEvaluationResults:
+    logger.warning("+++++ run_evaluation_docker_text")
 
     if isinstance(dataset_type, (InstructTextDatasetType, ChatTemplateDatasetType)):
         command = ["python", "-m", "validator.evaluation.eval_instruct_text"]
@@ -147,6 +148,15 @@ async def run_evaluation_docker_text(
             logger.error(f"Cleanup failed: {str(e)}")
 
     try:
+        #####################
+        logger.info("+" * 80)
+        logger.info(f"+++++ Running START: {cst.VALIDATOR_DOCKER_IMAGE}")
+        logger.info("+" * 80)
+        logger.info(f"gpus: {gpu_ids}")
+        logger.info(f"cmd: {command}")
+        logger.info(f"env: {environment}")
+        logger.info(f"volumes: {volume_bindings}")
+        #####################
         container: Container = await asyncio.to_thread(
             client.containers.run,
             cst.VALIDATOR_DOCKER_IMAGE,
@@ -159,6 +169,13 @@ async def run_evaluation_docker_text(
         )
         log_task = asyncio.create_task(asyncio.to_thread(stream_container_logs, container, get_all_context_tags()))
         result = await asyncio.to_thread(container.wait)
+        #####################
+        logger.info("+" * 80)
+        logger.info(result)
+        logger.info("+" * 80)
+        logger.info(f"+++++ Running DONE: {cst.VALIDATOR_DOCKER_IMAGE}")
+        logger.info("+" * 80)
+        #####################
         log_task.cancel()
 
         if result["StatusCode"] != 0:
@@ -233,6 +250,14 @@ async def run_evaluation_docker_image(
             logger.error(f"Cleanup failed: {str(e)}")
 
     try:
+        #####################
+        logger.info("+" * 80)
+        logger.info(f"+++++ Running START: {cst.VALIDATOR_DOCKER_IMAGE_DIFFUSION}")
+        logger.info("+" * 80)
+        logger.info(f"gpus: {gpu_ids}")
+        logger.info(f"env: {environment}")
+        logger.info(f"mounts: {mounts}")
+        #####################
         container = await asyncio.to_thread(
             client.containers.run,
             cst.VALIDATOR_DOCKER_IMAGE_DIFFUSION,
@@ -244,6 +269,13 @@ async def run_evaluation_docker_image(
         )
         log_task = asyncio.create_task(asyncio.to_thread(stream_container_logs, container, get_all_context_tags()))
         result = await asyncio.to_thread(container.wait)
+        #####################
+        logger.info("+" * 80)
+        logger.info(result)
+        logger.info("+" * 80)
+        logger.info(f"+++++ Running DONE: {cst.VALIDATOR_DOCKER_IMAGE_DIFFUSION}")
+        logger.info("+" * 80)
+        #####################
         log_task.cancel()
 
         if result["StatusCode"] != 0:
