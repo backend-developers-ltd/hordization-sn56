@@ -498,6 +498,7 @@ async def _evaluate_submissions(
     gpu_ids: list[int],
     dataset_type: TextDatasetType | None = None,
 ) -> dict[str, tuple[EvaluationResultText, EvaluationResultText] | EvaluationResultImage | Exception]:
+    logger.warning("+++++ _evaluate_submissions")
     unique_repos = list(set(submission_repos))
     if len(unique_repos) != len(submission_repos):
         logger.warning(f"Found duplicate repos. Deduplicating {len(submission_repos)} repos to {len(unique_repos)} unique repos")
@@ -821,6 +822,7 @@ async def process_miners_pool(
     gpu_ids: list[int],
     dataset_type: TextDatasetType | None = None,
 ) -> list[MinerResultsText | MinerResultsImage]:
+    logger.warning("+++++ process_miners_pool")
     assert task.task_id is not None, "We should have a task id when processing miners"
 
     is_tournament_task = await is_task_in_tournament(str(task.task_id), config.psql_db)
@@ -961,6 +963,7 @@ async def process_miners_pool(
 
 
 async def evaluate_and_score(task: AnyTypeRawTask, gpu_ids: list[int], config: Config) -> AnyTypeRawTask:
+    logger.warning("+++++ evaluate_and_score")
     assert task.task_id is not None, "Task ID must be present"
     assert task.test_data is not None, "Test data must be present"
 
