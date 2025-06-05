@@ -3,6 +3,10 @@ from urllib.parse import urlparse
 
 import aiohttp
 
+from fiber.logging_utils import get_logger
+
+logger = get_logger(__name__)
+
 
 async def download_s3_file(file_url: str, save_path: str = None, tmp_dir: str = "/tmp") -> str:
     """Download a file from an S3 URL and save it locally.
@@ -26,6 +30,7 @@ async def download_s3_file(file_url: str, save_path: str = None, tmp_dir: str = 
         >>> print(file_path)
         /data/file.txt
     """
+    logger.info(f"+++ S3 Download {file_url} {save_path} to {tmp_dir}")
     parsed_url = urlparse(file_url)
     file_name = os.path.basename(parsed_url.path)
     if save_path:
