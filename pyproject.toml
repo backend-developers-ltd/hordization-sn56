@@ -47,6 +47,7 @@ dependencies = [
     "langcheck==0.9.0",
     "detoxify",
     "diffusers",
+    "compute-horde-sdk==0.0.11",
     "gitpython",
     "nvidia-ml-py3",
     "aiofiles"
