@@ -26,6 +26,15 @@ logger = get_logger(__name__)
 
 def log_memory_stats():
     """Log detailed memory statistics for debugging."""
+    print("+++++ HUGGINGFACE CACHE BEGIN")
+    import subprocess
+    result = subprocess.run(
+        f"find {cst.DOCKER_EVAL_HF_CACHE_DIR} | sort",
+        shell=True, capture_output=True, text=True,
+    )
+    print(result.stdout.strip())
+    print(result.stderr.strip())
+    print("+++++ HUGGINGFACE CACHE END")
     logger.info("===== MEMORY STATS =====")
     if torch.cuda.is_available():
         for i in range(torch.cuda.device_count()):
