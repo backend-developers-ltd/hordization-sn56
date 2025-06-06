@@ -84,6 +84,7 @@ def load_model(model_name_or_path: str, is_base_model: bool = False) -> AutoMode
     try:
         # Only use default cache for the base model
         cache_dir = None if is_base_model else create_finetuned_cache_dir()
+        logger.info(f"+++++ common.load_model: {model_name_or_path=} {is_base_model=} {cache_dir=}")
 
         return AutoModelForCausalLM.from_pretrained(
             model_name_or_path,
@@ -116,6 +117,7 @@ def load_model(model_name_or_path: str, is_base_model: bool = False) -> AutoMode
 @retry_on_5xx()
 def load_tokenizer(original_model: str) -> AutoTokenizer:
     try:
+        logger.info(f"+++++ common.load_tokenizer: {original_model=}")
         return AutoTokenizer.from_pretrained(original_model, token=os.environ.get("HUGGINGFACE_TOKEN"))
     except Exception as e:
         logger.error(f"Exception type: {type(e)}, message: {str(e)}")
@@ -126,6 +128,7 @@ def load_tokenizer(original_model: str) -> AutoTokenizer:
 def load_finetuned_model(repo: str) -> AutoPeftModelForCausalLM:
     try:
         cache_dir = create_finetuned_cache_dir()
+        logger.info(f"+++++ common.load_finetuned_model: {repo=} {cache_dir=}")
         return AutoPeftModelForCausalLM.from_pretrained(
             repo,
             is_trainable=False,
