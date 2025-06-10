@@ -5,9 +5,9 @@ import tempfile
 import time
 from io import BytesIO
 
+from ch.patch import HfApi, hf_hub_download
+
 from datasets import get_dataset_config_names
-from huggingface_hub import HfApi
-from huggingface_hub import hf_hub_download
 from PIL import Image
 from transformers import AutoConfig
 from transformers import AutoModelForCausalLM

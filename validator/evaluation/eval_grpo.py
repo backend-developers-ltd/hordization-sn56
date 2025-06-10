@@ -2,6 +2,9 @@ import os
 import subprocess
 import time
 
+from ch import constants as ch_cst
+import ch.executor
+
 from accelerate.utils import find_executable_batch_size
 from axolotl.utils.dict import DictDefault
 from datasets import Dataset
@@ -215,6 +218,9 @@ def evaluate_grpo_repo(evaluation_args: EvaluationArgs) -> None:
 
 
 def main():
+    if ch_cst.CH_VALIDATION_GRPO_TASK:
+        ch.executor.init()
+
     logger.info("=== GRPO EVALUATION SCRIPT STARTING ===")
     dataset = os.environ.get("DATASET")
     original_model = os.environ.get("ORIGINAL_MODEL")
@@ -269,6 +275,9 @@ def main():
         logger.error(f"Error checking and logging base model size: {e}")
 
     logger.info("=== GRPO EVALUATION SCRIPT COMPLETED ===")
+
+    if ch_cst.CH_VALIDATION_GRPO_TASK:
+        ch.executor.process_results()
 
 
 if __name__ == "__main__":

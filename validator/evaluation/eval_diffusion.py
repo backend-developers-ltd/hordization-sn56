@@ -1,12 +1,14 @@
 import json
 import os
 
+from ch import constants as ch_cst
+from ch.patch import HfApi, snapshot_download
+import ch.executor
+
 import numpy as np
 import safetensors.torch
 from diffusers import StableDiffusionPipeline
 from fiber.logging_utils import get_logger
-from huggingface_hub import HfApi
-from huggingface_hub import snapshot_download
 from PIL import Image
 
 from core.models.utility_models import ImageModelType
@@ -234,6 +236,9 @@ def _count_model_parameters(model_path: str, is_safetensors: bool) -> int:
 
 
 def main():
+    if ch_cst.CH_VALIDATION_IMAGE_TASK:
+        ch.executor.init()
+
     test_dataset_path = os.environ.get("DATASET")
     base_model_repo = os.environ.get("ORIGINAL_MODEL_REPO")
     trained_lora_model_repos = os.environ.get("MODELS", "")
@@ -300,6 +305,9 @@ def main():
     logger.info(f"Evaluation results saved to {output_file}")
 
     logger.info(json.dumps(results))
+
+    if ch_cst.CH_VALIDATION_IMAGE_TASK:
+        ch.executor.process_results()
 
 
 if __name__ == "__main__":

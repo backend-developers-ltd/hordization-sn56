@@ -4,6 +4,9 @@ from pathlib import Path
 from pydantic import TypeAdapter
 import json
 
+from ch import constants as ch_cst
+import ch.executor
+
 import torch
 from accelerate.utils import find_executable_batch_size
 from axolotl.utils.data import load_tokenized_prepared_datasets
@@ -168,6 +171,9 @@ def evaluate_repo(evaluation_args: EvaluationArgs) -> None:
 
 
 def main():
+    if ch_cst.CH_VALIDATION_INSTRUCT_TEXT_TASK:
+        ch.executor.init()
+
     logger.info("=== INSTRUCT TEXT EVALUATION SCRIPT STARTING ===")
     dataset = os.environ.get("DATASET")
     original_model = os.environ.get("ORIGINAL_MODEL")
@@ -210,6 +216,9 @@ def main():
         logger.error(f"Error checking and logging base model size: {e}")
 
     logger.info("=== INSTRUCT TEXT EVALUATION SCRIPT COMPLETED ===")
+
+    if ch_cst.CH_VALIDATION_INSTRUCT_TEXT_TASK:
+        ch.executor.process_results()
 
 
 if __name__ == "__main__":

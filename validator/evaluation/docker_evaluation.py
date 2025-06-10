@@ -9,6 +9,9 @@ import docker
 from docker.models.containers import Container
 from docker.types import Mount
 
+from ch import constants as ch_cst
+import ch.job
+
 from core import constants as cst
 from core.models.payload_models import DockerEvaluationResults
 from core.models.payload_models import EvaluationResultImage
@@ -94,6 +97,7 @@ def process_evaluation_results(results: dict, is_image: bool = False) -> DockerE
 
 
 async def run_evaluation_docker_text(
+    dataset_url: str,
     dataset: str,
     models: list[str],
     original_model: str,
@@ -126,6 +130,54 @@ async def run_evaluation_docker_text(
         "FILE_FORMAT": file_format.value,
     }
     logger.info(f"Running {task_type} evaluation for models: {models}")
+
+    log_id = ch.job.log_run_evaluation_docker_text(
+        dataset_url,
+        dataset,
+        models,
+        original_model,
+        dataset_type,
+        file_format,
+        gpu_ids,
+        command,
+        environment,
+    )
+    match dataset_type:
+        case DpoDatasetType():
+            ch_validation = ch_cst.CH_VALIDATION_DPO_TASK
+        case GrpoDatasetType():
+            ch_validation = ch_cst.CH_VALIDATION_GRPO_TASK
+        case InstructTextDatasetType():
+            ch_validation = ch_cst.CH_VALIDATION_INSTRUCT_TEXT_TASK
+        case _:
+            ch_validation = False
+    if ch_validation:
+        eval_results = await ch.job.run_evaluation_docker_text(
+            dataset_url,
+            dataset,
+            models,
+            original_model,
+            dataset_type,
+            file_format,
+            gpu_ids,
+            command,
+            environment,
+        )
+        ch.job.log_run_evaluation_docker_text(
+            dataset_url,
+            dataset,
+            models,
+            original_model,
+            dataset_type,
+            file_format,
+            gpu_ids,
+            command,
+            environment,
+            log_id + "-ch",
+            eval_results,
+        )
+        if not ch_cst.CH_VALIDATION_DUAL:
+            return process_evaluation_results(eval_results, is_image=False)
 
     volume_bindings = {
         dataset_dir: {
@@ -182,6 +234,19 @@ async def run_evaluation_docker_text(
             raise Exception(f"Container exited with status {result['StatusCode']}")
 
         eval_results = await get_evaluation_results(container)
+        ch.job.log_run_evaluation_docker_text(
+            dataset_url,
+            dataset,
+            models,
+            original_model,
+            dataset_type,
+            file_format,
+            gpu_ids,
+            command,
+            environment,
+            log_id + "-base",
+            eval_results,
+        )
         return process_evaluation_results(eval_results, is_image=False)
 
     except Exception as e:
@@ -204,6 +269,36 @@ async def run_evaluation_docker_image(
     model_type: ImageModelType,
     gpu_ids: list[int]
 ) -> DockerEvaluationResults:
+    log_id = ch.job.log_run_evaluation_docker_image(
+        test_split_url,
+        original_model_repo,
+        models,
+        model_type,
+        gpu_ids,
+        "/workspace/input_data",
+    )
+    if ch_cst.CH_VALIDATION_IMAGE_TASK:
+        eval_results_dict = await ch.job.run_evaluation_docker_image(
+            test_split_url,
+            original_model_repo,
+            models,
+            model_type,
+            gpu_ids,
+            "/workspace/input_data",
+        )
+        ch.job.log_run_evaluation_docker_image(
+            test_split_url,
+            original_model_repo,
+            models,
+            model_type,
+            gpu_ids,
+            "/workspace/input_data",
+            log_id + "-ch",
+            eval_results_dict,
+        )
+        if not ch_cst.CH_VALIDATION_DUAL:
+            return process_evaluation_results(eval_results_dict, is_image=True)
+
     raw_data = await download_s3_file(test_split_url)
     test_split_path = unzip_to_temp_path(raw_data)
     dataset_dir = os.path.abspath(test_split_path)
@@ -282,6 +377,16 @@ async def run_evaluation_docker_image(
             raise Exception(f"Container exited with status {result['StatusCode']}")
 
         eval_results_dict = await get_evaluation_results(container)
+        ch.job.log_run_evaluation_docker_image(
+            test_split_url,
+            original_model_repo,
+            models,
+            model_type,
+            gpu_ids,
+            "/workspace/input_data",
+            log_id + "-base",
+            eval_results_dict,
+        )
         return process_evaluation_results(eval_results_dict, is_image=True)
 
     except Exception as e:

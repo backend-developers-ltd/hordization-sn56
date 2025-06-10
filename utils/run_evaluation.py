@@ -157,6 +157,7 @@ async def run_evaluation_from_task_id(
     try:
         logger.info(f"Running test data evaluation for models: {models_to_evaluate}")
         test_data_results = await run_evaluation_docker_text(
+            dataset_url=test_data_url,
             dataset=test_data_path,
             models=models_to_evaluate,
             original_model=original_model,
@@ -176,6 +177,7 @@ async def run_evaluation_from_task_id(
 
         logger.info(f"Running synthetic data evaluation for models: {models_to_evaluate}")
         synth_data_results = await run_evaluation_docker_text(
+            dataset_url=task_details.synthetic_data,
             dataset=synth_data_path,
             models=models_to_evaluate,
             original_model=original_model,

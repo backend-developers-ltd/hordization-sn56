@@ -4,9 +4,10 @@ import re
 import requests
 from datetime import datetime
 
+from ch.patch import HfApi
+
 import numpy as np
 from fiber.chain.models import Node
-from huggingface_hub import HfApi
 
 import validator.core.constants as cts
 from core.models.payload_models import DiffusionLosses
@@ -534,7 +535,7 @@ async def _evaluate_submissions(
 
         logger.info("Starting test evaluation")
         test_data_filepath = await download_s3_file(task.test_data)
-        test_results = await run_evaluation_docker_text(dataset=test_data_filepath, **evaluation_params)
+        test_results = await run_evaluation_docker_text(dataset_url=task.test_data, dataset=test_data_filepath, **evaluation_params)
 
         try:
             os.remove(test_data_filepath)
@@ -575,6 +576,7 @@ async def _evaluate_submissions(
             logger.info(f"Evaluating synthetic data for top {len(top_4_repos)} models")
             synthetic_data_filepath = await download_s3_file(task.synthetic_data)
             synth_results = await run_evaluation_docker_text(
+                dataset_url=task.synthetic_data,
                 dataset=synthetic_data_filepath,
                 models=top_4_repos,
                 **{k: v for k, v in evaluation_params.items() if k != "models"},

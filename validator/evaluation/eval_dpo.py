@@ -2,6 +2,9 @@ import os
 import subprocess
 import traceback
 
+from ch import constants as ch_cst
+import ch.executor
+
 import torch
 from accelerate.utils import find_executable_batch_size
 from axolotl.utils.dict import DictDefault
@@ -256,6 +259,9 @@ def evaluate_dpo_repo(evaluation_args: EvaluationArgs) -> None:
 
 
 def main():
+    if ch_cst.CH_VALIDATION_DPO_TASK:
+        ch.executor.init()
+
     logger.info("=== DPO EVALUATION SCRIPT STARTING ===")
     dataset = os.environ.get("DATASET")
     original_model = os.environ.get("ORIGINAL_MODEL")
@@ -292,6 +298,9 @@ def main():
         logger.error(f"Error checking and logging base model size: {e}")
 
     logger.info("=== DPO EVALUATION SCRIPT COMPLETED ===")
+
+    if ch_cst.CH_VALIDATION_DPO_TASK:
+        ch.executor.process_results()
 
 
 if __name__ == "__main__":

@@ -1,5 +1,8 @@
 import sys
 
+from ch import constants as ch_cst
+import ch.executor
+
 from validator.core.models import EvaluationArgs
 from validator.evaluation.eval_grpo import evaluate_grpo_repo
 from validator.utils.logging import get_logger
@@ -14,6 +17,9 @@ if __name__ == "__main__":
             "Usage: python -m validator.evaluation.single_eval_grpo <serialized_evaluation_args>"
         )
         sys.exit(1)
+
+    if ch_cst.CH_VALIDATION_GRPO_TASK:
+        ch.executor.init()
 
     evaluation_args = EvaluationArgs.model_validate_json(sys.argv[1])
     evaluate_grpo_repo(evaluation_args)
