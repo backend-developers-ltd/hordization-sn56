@@ -32,4 +32,5 @@ def validate_reward_function(func_def: str) -> tuple[bool, str, Callable | None]
 
         return True, "", func
     except Exception as e:
+        logger.exception(f"Error validating reward function: {e}")
         return False, str(e), None
