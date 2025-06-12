@@ -44,4 +44,9 @@ RUN echo '#!/bin/bash\n\
 python /app/validator/evaluation/ComfyUI/main.py &\n\
 python -m validator.evaluation.eval_diffusion' > /app/start.sh && chmod +x /app/start.sh
 
+ARG GIT_COMMIT=""
+ENV GIT_COMMIT="${GIT_COMMIT}"
+ARG BUILD_DATE=""
+ENV BUILD_DATE="${BUILD_DATE}"
+
 CMD ["/app/start.sh"]
