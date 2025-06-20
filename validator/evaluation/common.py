@@ -121,6 +121,8 @@ def load_model(model_name_or_path: str, is_base_model: bool = False) -> AutoMode
     except Exception as e:
         logger.error(f"Exception type: {type(e)}, message: {str(e)}")
         raise  # Re-raise the exception to trigger retry
+    finally:
+        logger.info(f"+++++ common.load_model DONE: {model_name_or_path=}")
 
 
 @retry_on_5xx()
