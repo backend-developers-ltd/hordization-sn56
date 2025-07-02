@@ -8,7 +8,7 @@ from fiber.logging_utils import get_logger
 logger = get_logger(__name__)
 
 
-async def download_s3_file(file_url: str, save_path: str = None, tmp_dir: str = os.path.expanduser("~/tmp")) -> str:
+async def download_s3_file(file_url: str, save_path: str = None, tmp_dir: str = os.path.expanduser("~/volume/sn56/tmp")) -> str:
     """Download a file from an S3 URL and save it locally.
 
     Args:
