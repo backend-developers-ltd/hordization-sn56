@@ -3,6 +3,7 @@ import io
 import json
 import os
 import shutil
+import random
 import tarfile
 
 import docker
@@ -328,11 +329,16 @@ async def run_evaluation_docker_image(
         )
     ]
 
+    if ch_cst.USE_RANDOM_SEED or os.environ.get("USE_RANDOM_SEED") == "1":
+        seed = str(random.randint(1, 2**30))
+    else:
+        seed = ""
     environment = {
         "DATASET": container_dataset_path,
         "MODELS": ",".join(models),
         "ORIGINAL_MODEL_REPO": original_model_repo,
         "MODEL_TYPE": model_type.value,
+        "GENERATION_SEED": seed,
     }
 
     async def cleanup_resources():

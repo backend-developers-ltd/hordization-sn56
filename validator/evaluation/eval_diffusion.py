@@ -162,6 +162,8 @@ def edit_workflow(
     payload["Sampler"]["inputs"]["denoise"] = edit_elements.denoise
     payload["Image_loader"]["inputs"]["image"] = edit_elements.base_image
     payload["Lora_loader"]["inputs"]["lora_name"] = edit_elements.lora_name
+    if edit_elements.seed is not None:
+        payload["Sampler"]["inputs"]["seed"] = edit_elements.seed
     if text_guided:
         payload["Prompt"]["inputs"]["text"] = edit_elements.prompt
     else:
@@ -243,6 +245,11 @@ def main():
     base_model_repo = os.environ.get("ORIGINAL_MODEL_REPO")
     trained_lora_model_repos = os.environ.get("MODELS", "")
     model_type = os.environ.get("MODEL_TYPE")
+    generation_seed = os.environ.get("GENERATION_SEED", "")
+    if generation_seed:
+        generation_seed = int(generation_seed)
+    else:
+        generation_seed = None
     if not all([test_dataset_path, base_model_repo, trained_lora_model_repos, model_type]):
         logger.error("Missing required environment variables.")
         exit(1)
@@ -282,6 +289,7 @@ def main():
                 comfy_template=lora_comfy_template if is_safetensors else diffusers_comfy_template,
                 is_safetensors=is_safetensors,
                 model_type=model_type,
+                seed=generation_seed
             )
 
             loss_data = eval_loop(test_dataset_path, img2img_payload)

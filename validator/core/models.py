@@ -394,6 +394,7 @@ class Img2ImgPayload(BaseModel):
     is_safetensors: bool = True
     prompt: str | None = None
     base_image: str | None = None
+    seed: int | None = None
 
     model_config = ConfigDict(protected_namespaces=())
 
