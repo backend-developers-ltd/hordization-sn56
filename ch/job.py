@@ -51,6 +51,8 @@ def log_run_evaluation_docker_image(
 
     log_data = {
         "timestamp": datetime.now().isoformat(),
+        "task_id": os.environ.get("TASK_ID"),
+        "use_random_seed": os.environ.get("USE_RANDOM_SEED") == "1",
         "test_split_url": test_split_url,
         "original_model_repo": original_model_repo,
         "models": models,
@@ -87,6 +89,8 @@ def log_run_evaluation_docker_text(
 
     log_data = {
         "timestamp": datetime.now().isoformat(),
+        "task_id": os.environ.get("TASK_ID"),
+        "use_random_seed": os.environ.get("USE_RANDOM_SEED") == "1",
         "dataset_url": dataset_url,
         "dataset": dataset,
         "models": models,
