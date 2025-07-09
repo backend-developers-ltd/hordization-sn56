@@ -6,6 +6,7 @@
 import argparse
 import asyncio
 import json
+import sys
 import os
 from typing import List
 from typing import Optional
@@ -200,6 +201,7 @@ async def run_evaluation_from_task_id(
 
 
 if __name__ == "__main__":
+    print(" ".join(sys.argv))
     parser = argparse.ArgumentParser(
         description="""
         Run model evaluation for a specific task. 
