@@ -117,6 +117,7 @@ async def post_to_nineteen_image(payload: dict[str, Any], keypair: Keypair) -> s
 
 @retry_http_with_backoff
 async def _post_to_nineteen_ai(url: str, payload: dict[str, Any], keypair: Keypair) -> httpx.Response:
+    logger.info(f"+++++ _post_to_nineteen_ai {url}:\n{payload}")
     if NINETEEN_API_KEY is None:
         headers = _get_headers_for_signed_https_request(keypair)
     else:
@@ -132,6 +133,7 @@ async def _post_to_nineteen_ai(url: str, payload: dict[str, Any], keypair: Keypa
             logger.error(f"Error in nineteen ai response: {response.content}")
             response.raise_for_status()
 
+        logger.info(f"+++++ \n{payload}")
         return response
 
 
