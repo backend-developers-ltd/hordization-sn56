@@ -99,6 +99,7 @@ async def _get_datasets_for_bin(min_rows: int, max_rows: int, keypair: Keypair, 
             response = await call_content_service(cst.GET_RANDOM_DATASETS_ENDPOINT, keypair, params)
             if not isinstance(response, list):
                 raise TypeError("Expected a list of responses from GET_ALL_DATASETS_ENDPOINT")
+            logger.info(f"++++++ Response from {cst.GET_RANDOM_DATASETS_ENDPOINT}: {response}")
 
             dataset_dicts: list[dict[str, Any]] = response
             datasets = [Dataset.model_validate(ds) for ds in dataset_dicts]
@@ -106,9 +107,11 @@ async def _get_datasets_for_bin(min_rows: int, max_rows: int, keypair: Keypair, 
 
             for dataset in datasets:
                 logger.info(
+                    "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
                     f"Dataset: {dataset.dataset_id} (rows: {dataset.num_rows}, "
                     f"bytes: {dataset.num_bytes_parquet_files}, "
-                    f"dpo_available: {dataset.dpo_available})"
+                    f"dpo_available: {dataset.dpo_available})\n"
+                    "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
                 )
                 yield dataset
 
