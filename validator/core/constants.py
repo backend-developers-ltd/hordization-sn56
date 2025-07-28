@@ -109,21 +109,21 @@ INSTRUCT_TEXT_DATASET_BINS_TO_TRAINING_HOURS_RANGE = {
 }
 
 # text augmentation synth
-TEXT_SYNTH_MODEL = "casperhansen/deepseek-r1-distill-qwen-32b-awq"
+TEXT_SYNTH_MODEL = "gemma-3-27b-it"
 TEXT_SYNTH_WEAKER_MODEL = "llama-3-2-3b"
 TEXT_SYNTH_MODEL_TEMPERATURE = 0.6
 TEXT_SYNTH_MODEL_MAX_TOKENS = 5024
 END_OF_REASONING_TAG = "</think>"
 
 # image prompt generation synth
-IMAGE_PROMPT_GEN_MODEL = "casperhansen/deepseek-r1-distill-qwen-32b-awq"
+IMAGE_PROMPT_GEN_MODEL = "gemma-3-27b-it"
 IMAGE_PROMPT_GEN_MODEL_TEMPERATURE = 0.4
 IMAGE_PROMPT_GEN_MODEL_MAX_TOKENS = 5024
 IMAGE_STYLE_PICKING_NUM_TRIES = 10
 PERSON_GEN_RETRIES = 3
 
 # endpoints
-PROMPT_GEN_ENDPOINT = "https://api.nineteen.ai/v1/chat/completions"
+PROMPT_GEN_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
 IMAGE_GEN_ENDPOINT = "https://api.nineteen.ai/v1/text-to-image"
 GRADIENTS_ENDPOINT = "https://api.gradients.io/validator-signup"
 PROMPT_PATH = "validator/prompts.yml"

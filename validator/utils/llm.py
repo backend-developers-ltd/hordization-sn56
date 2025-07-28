@@ -30,8 +30,7 @@ def remove_reasoning_part(content: str, end_of_reasoning_tag: str) -> str:
         return content
     else:
         logger.warning(f"No end of reasoning tag found in content: {content}")
-        logger.warning("Returning empty string")
-        return ""
+        return content
 
 
 def extract_json_from_response(response: str) -> dict:

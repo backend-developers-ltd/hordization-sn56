@@ -152,7 +152,7 @@ class DiffusionJob(Job):
 
 
 class Role(str, Enum):
-    SYSTEM = "system"
+    SYSTEM = "user"
     USER = "user"
     ASSISTANT = "assistant"
 
