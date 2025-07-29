@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import time
+import base64
 from typing import Any
 
 import httpx
@@ -17,7 +18,7 @@ from validator.core.config import Config
 from validator.core.constants import GRADIENTS_ENDPOINT
 from validator.core.constants import IMAGE_GEN_ENDPOINT
 from validator.core.constants import NETUID
-from validator.core.constants import NINETEEN_API_KEY
+from validator.core.constants import NINETEEN_API_KEY, NINETEEN_API_IMAGE_KEY
 from validator.core.constants import PROMPT_GEN_ENDPOINT
 from validator.utils.logging import get_logger
 from validator.utils.util import retry_http_with_backoff
@@ -111,8 +112,23 @@ async def post_to_nineteen_chat(payload: dict[str, Any], keypair: Keypair) -> st
 
 
 async def post_to_nineteen_image(payload: dict[str, Any], keypair: Keypair) -> str | None:
-    response = await _post_to_nineteen_ai(IMAGE_GEN_ENDPOINT, payload, keypair)
-    return response.json()
+    logger.info(f"+++++ post_to_nineteen_image:\n{payload}")
+    headers = {
+        "Authorization": f"Bearer {NINETEEN_API_IMAGE_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    url = IMAGE_GEN_ENDPOINT
+    async with httpx.AsyncClient(timeout=120) as client:
+        response = await client.post(url=url, json=payload, headers=headers)
+        if response.status_code != 200:
+            # NOTE: What do to about these as they pollute everywhere
+            logger.error(f"Error in nineteen ai response: {response.content}")
+            response.raise_for_status()
+
+        image = response.read()
+        logger.info(f"+++++ {len(image):,} bytes")
+        return dict(image_b64=base64.b64encode(image).decode("utf8"))
 
 
 @retry_http_with_backoff

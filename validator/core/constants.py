@@ -124,7 +124,7 @@ PERSON_GEN_RETRIES = 3
 
 # endpoints
 PROMPT_GEN_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-IMAGE_GEN_ENDPOINT = "https://api.nineteen.ai/v1/text-to-image"
+IMAGE_GEN_ENDPOINT = "https://chutes-flux-1-schnell.chutes.ai/generate"
 GRADIENTS_ENDPOINT = "https://api.gradients.io/validator-signup"
 PROMPT_PATH = "validator/prompts.yml"
 NINETEEN_API_KEY = os.getenv("NINETEEN_API_KEY")
